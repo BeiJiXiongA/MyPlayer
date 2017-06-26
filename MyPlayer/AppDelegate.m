@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "MusicListViewController.h"
+//http://www.jianshu.com/p/ab300ea6e90c 后台播放
 
 @interface AppDelegate ()
 
