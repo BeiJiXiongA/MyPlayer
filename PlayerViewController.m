@@ -26,8 +26,11 @@
     controlView.musicList = _musicList;
     controlView.playedMusicModel = _currentMusicModel;
     [self.view addSubview:controlView];
+    if (![MyMusicPlayer sharedMusicPlayer].currentMusicModel ||
+        ![_currentMusicModel.musicName isEqualToString:[MyMusicPlayer sharedMusicPlayer].currentMusicModel.musicName]) {
+        [controlView play];
+    }
     
-    [controlView playMusicWithPath:[CatalogueTools getDocumentPathWithName:_currentMusicModel.musicName]];
 }
 
 - (void)didReceiveMemoryWarning {

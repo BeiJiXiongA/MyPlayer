@@ -13,6 +13,6 @@
 @property (nonatomic, strong) MusicModel *playedMusicModel;
 @property (nonatomic, strong) NSArray *musicList;
 
--(void)playMusicWithPath:(NSString *)musicPath;
+-(void)play;
 
 @end

@@ -13,8 +13,17 @@
 @interface MyMusicPlayer : NSObject<AVAudioPlayerDelegate>
 @property (nonatomic, strong) AVAudioPlayer *player;
 @property (nonatomic, strong) NSTimer *timer;
+@property (nonatomic, strong) NSArray *musicList;
+@property (nonatomic, strong) MusicModel *currentMusicModel;
 
 +(MyMusicPlayer *)sharedMusicPlayer;
 
--(void)playMusic:(NSString *)musicPath;
+-(void)playMusic:(MusicModel *)musicModel;
+
+-(void)pre;
+
+-(void)next;
+
+-(void)playClick:(void (^)(BOOL isPlaying))action;
+
 @end

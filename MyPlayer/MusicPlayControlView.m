@@ -83,9 +83,9 @@
     return self;
 }
 
--(void)playMusicWithPath:(NSString *)musicPath
+-(void)play
 {
-    [myMusicPlayer playMusic:musicPath];
+    [myMusicPlayer playMusic:_playedMusicModel];
 }
 
 -(void)valueChanged:(UISlider *)slider
@@ -95,35 +95,23 @@
 
 -(void)nextMusic:(UIButton *)button
 {
-    NSInteger index = [_musicList indexOfObject:_playedMusicModel];
-    if (index == _musicList.count - 1) {
-        _playedMusicModel = [_musicList firstObject];
-    }else{
-        _playedMusicModel = [_musicList objectAtIndex:++index];
-    }
-    [myMusicPlayer playMusic:[CatalogueTools getDocumentPathWithName:_playedMusicModel.musicName]];
+    [myMusicPlayer next];
 }
 
 -(void)preMusic:(UIButton *)button
 {
-    NSInteger index = [_musicList indexOfObject:_playedMusicModel];
-    if (index == 0) {
-        _playedMusicModel = [_musicList lastObject];
-    }else{
-        _playedMusicModel = [_musicList objectAtIndex:--index];
-    }
-    [myMusicPlayer playMusic:[CatalogueTools getDocumentPathWithName:_playedMusicModel.musicName]];
+    [myMusicPlayer pre];
 }
 
 -(void)controlMusic:(UIButton *)button
 {
-    if ([myMusicPlayer.player isPlaying]) {
-        [myMusicPlayer.player stop];
-        [playButton setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
-    }else{
-        [myMusicPlayer.player play];
-        [playButton setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateNormal];
-    }
+    [myMusicPlayer playClick:^(BOOL isPlaying){
+        if (isPlaying) {
+            [playButton setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateNormal];
+        }else{
+            [playButton setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
+        }
+    }];
 }
 
 @end

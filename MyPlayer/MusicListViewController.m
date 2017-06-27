@@ -52,6 +52,7 @@
         model.musicInfo = [self getInfoWithMusicPath:musicPath];
         [_listArray addObject:model];
     }];
+    [MyMusicPlayer sharedMusicPlayer].musicList = _listArray;
     [_listTableView reloadData];
 }
 
