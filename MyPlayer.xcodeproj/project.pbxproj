@@ -24,6 +24,7 @@
 		DB8D59DC1CA6BC6400CDB8EC /* AAViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = DB8D59DB1CA6BC6400CDB8EC /* AAViewController.m */; };
 		DB8D59E11CA6C45E00CDB8EC /* UIView+Extention.m in Sources */ = {isa = PBXBuildFile; fileRef = DB8D59E01CA6C45E00CDB8EC /* UIView+Extention.m */; };
 		DB8D59E31CA6C94D00CDB8EC /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DB8D59E21CA6C94D00CDB8EC /* MediaPlayer.framework */; };
+		DBBD61BF1F06ACCB0062C74E /* PlayingMusicInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = DBBD61BE1F06ACCB0062C74E /* PlayingMusicInfo.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +80,8 @@
 		DB8D59DF1CA6C45E00CDB8EC /* UIView+Extention.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Extention.h"; sourceTree = "<group>"; };
 		DB8D59E01CA6C45E00CDB8EC /* UIView+Extention.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Extention.m"; sourceTree = "<group>"; };
 		DB8D59E21CA6C94D00CDB8EC /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		DBBD61BD1F06ACCB0062C74E /* PlayingMusicInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayingMusicInfo.h; sourceTree = "<group>"; };
+		DBBD61BE1F06ACCB0062C74E /* PlayingMusicInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayingMusicInfo.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +161,8 @@
 				DB4410661F01A632002BB3FA /* CatalogueTools.m */,
 				DB4410681F01C042002BB3FA /* MusicModel.h */,
 				DB4410691F01C042002BB3FA /* MusicModel.m */,
+				DBBD61BD1F06ACCB0062C74E /* PlayingMusicInfo.h */,
+				DBBD61BE1F06ACCB0062C74E /* PlayingMusicInfo.m */,
 			);
 			path = MyPlayer;
 			sourceTree = "<group>";
@@ -332,6 +337,7 @@
 				DB5030E91EFEC46400EB0A54 /* MusicPlayControlView.m in Sources */,
 				DB27836B1CA699300070E875 /* AppDelegate.m in Sources */,
 				DB5030E31EFEBF3F00EB0A54 /* ListTableViewCell.m in Sources */,
+				DBBD61BF1F06ACCB0062C74E /* PlayingMusicInfo.m in Sources */,
 				DB5030E61EFEC27200EB0A54 /* PlayerViewController.m in Sources */,
 				DB8D59DC1CA6BC6400CDB8EC /* AAViewController.m in Sources */,
 				DB2783681CA699300070E875 /* main.m in Sources */,

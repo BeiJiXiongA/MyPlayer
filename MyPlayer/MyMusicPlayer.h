@@ -9,12 +9,15 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import <AudioToolbox/AudioToolbox.h>
+#import "PlayingMusicInfo.h"
 
 @interface MyMusicPlayer : NSObject<AVAudioPlayerDelegate>
 @property (nonatomic, strong) AVAudioPlayer *player;
 @property (nonatomic, strong) NSTimer *timer;
 @property (nonatomic, strong) NSArray *musicList;
 @property (nonatomic, strong) MusicModel *currentMusicModel;
+
+@property (nonatomic, copy) void (^processChanged)(PlayingMusicInfo *processInfo);
 
 +(MyMusicPlayer *)sharedMusicPlayer;
 
