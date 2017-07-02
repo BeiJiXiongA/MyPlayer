@@ -80,9 +80,11 @@
     [_listArray removeAllObjects];
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *docDir = [paths objectAtIndex:0];
+    NSLog(@"doc path %@",docDir);
     NSError *error = nil;
     NSArray *documentFiles = [_fileManager contentsOfDirectoryAtPath:docDir error:&error];
     [documentFiles enumerateObjectsUsingBlock:^(NSString *musicName, NSUInteger idx, BOOL * _Nonnull stop) {
+        
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             NSString *musicPath = [CatalogueTools getDocumentPathWithName:musicName];
             MusicModel *model = [[MusicModel alloc] init];
@@ -126,6 +128,32 @@
     listCell.artistLabel.text = [infoDict objectForKey:@"artist"];
     listCell.albumLabel.text = [infoDict objectForKey:@"albumName"];
     return listCell;
+}
+
+-(UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return UITableViewCellEditingStyleDelete;
+}
+
+-(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return YES;
+}
+
+-(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        MusicModel *model = [_listArray objectAtIndex:indexPath.row];
+        [_listArray removeObject:model];
+        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        NSError *error = nil;
+        if (![fileManager removeItemAtPath:[CatalogueTools getDocumentPathWithName:model.musicName] error:&error]) {
+            NSLog(@"file remove error %@",error);
+        }else{
+            NSLog(@"file remove success!");
+        }
+    }
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

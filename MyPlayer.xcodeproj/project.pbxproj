@@ -343,7 +343,7 @@
 						DevelopmentTeam = X2AB8TRR33;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
-								enabled = 1;
+								enabled = 0;
 							};
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -594,7 +594,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = MyPlayer/MyPlayer.entitlements;
 				DEVELOPMENT_TEAM = X2AB8TRR33;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/MyPlayer/Defines.pch";
 				INFOPLIST_FILE = MyPlayer/Info.plist;
@@ -610,7 +609,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = MyPlayer/MyPlayer.entitlements;
 				DEVELOPMENT_TEAM = X2AB8TRR33;
 				GCC_PREFIX_HEADER = "$(SRCROOT)/MyPlayer/Defines.pch";
 				INFOPLIST_FILE = MyPlayer/Info.plist;
@@ -744,6 +742,7 @@
 				E42075321F0915C700A2846C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
