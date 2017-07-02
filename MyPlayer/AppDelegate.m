@@ -24,13 +24,44 @@
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    if ([ud objectForKey:PlayedMusicInfoMusicName]) {
+        [self playTerminateMusic];
+        [[MyMusicPlayer sharedMusicPlayer] pause];
+    }
+    
     MusicListViewController *list = [[MusicListViewController alloc] init];
     UINavigationController *listNav = [[UINavigationController alloc] initWithRootViewController:list];
+    UINavigationBar *bar = [UINavigationBar appearance];
+    //设置显示的颜色
+    bar.barTintColor = [UIColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:1];
+    //设置字体颜色
+    bar.tintColor = [UIColor whiteColor];
+    [bar setTitleTextAttributes:@{NSForegroundColorAttributeName : [UIColor whiteColor]}];
+    //或者用这个都行
+    
+    //    [bar setTitleTextAttributes:@{UITextAttributeTextColor : [UIColor whiteColor]}];
     self.window.rootViewController = listNav;
     
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     return YES;
+}
+
+-(void)playTerminateMusic
+{
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    if ([ud objectForKey:PlayedMusicInfoMusicName]) {
+        PlayingMusicInfo *musicInfo = [PlayingMusicInfo sharedMusicInfo];
+        musicInfo.musicPlayedTime = [[ud objectForKey:PlayedMusicInfoPlayedTime] doubleValue];
+        musicInfo.musicDuration = [[ud objectForKey:PlayedMusicInfoDuration] doubleValue];
+        MusicModel *musicModel = [[MusicModel alloc] init];
+        musicModel.musicName = [ud objectForKey:PlayedMusicInfoMusicName];
+        musicModel.musicInfo = [ud objectForKey:PlayedMusicInfoMusicInfo];
+        musicInfo.musicModel = musicModel;
+        [[MyMusicPlayer sharedMusicPlayer] playMusic:musicModel];
+        [[MyMusicPlayer sharedMusicPlayer] playAtTime:[[ud objectForKey:PlayedMusicInfoPlayedTime] doubleValue]];
+    }
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -68,7 +99,41 @@
 
 -(void)remoteControlReceivedWithEvent:(UIEvent *)event
 {
-    
+    if(event.type==UIEventTypeRemoteControl)
+    {
+        NSInteger order=-1;
+        switch (event.subtype) {
+            case UIEventSubtypeRemoteControlPause:
+                order=UIEventSubtypeRemoteControlPause;
+                [[MyMusicPlayer sharedMusicPlayer] pause];
+                break;
+            case UIEventSubtypeRemoteControlPlay:
+                order=UIEventSubtypeRemoteControlPlay;
+                if ([PlayingMusicInfo sharedMusicInfo].musicModel) {
+                    [[MyMusicPlayer sharedMusicPlayer] resumePlay];
+                }else{
+                    [self playTerminateMusic];
+                }
+                
+                break;
+            case UIEventSubtypeRemoteControlNextTrack:
+                order=UIEventSubtypeRemoteControlNextTrack;
+                [[MyMusicPlayer sharedMusicPlayer] next];
+                break;
+            case UIEventSubtypeRemoteControlPreviousTrack:
+                order=UIEventSubtypeRemoteControlPreviousTrack;
+                [[MyMusicPlayer sharedMusicPlayer] pre];
+                break;
+            case UIEventSubtypeRemoteControlTogglePlayPause:
+                order=UIEventSubtypeRemoteControlTogglePlayPause;
+                break;
+            default:
+                order=-1;
+                break;
+        }
+        NSDictionary *orderDict=@{@"order":@(order)};
+        NSLog(@"order dict %@",orderDict);
+    }
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -86,6 +151,14 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+    
+    if ([PlayingMusicInfo sharedMusicInfo].musicModel) {
+        [[NSUserDefaults standardUserDefaults] setObject:@([PlayingMusicInfo sharedMusicInfo].musicDuration) forKey:PlayedMusicInfoDuration];
+        [[NSUserDefaults standardUserDefaults] setObject:@([PlayingMusicInfo sharedMusicInfo].musicPlayedTime) forKey:PlayedMusicInfoPlayedTime];
+        [[NSUserDefaults standardUserDefaults] setObject:[PlayingMusicInfo sharedMusicInfo].musicModel.musicName forKey:PlayedMusicInfoMusicName];
+        [[NSUserDefaults standardUserDefaults] setObject:[PlayingMusicInfo sharedMusicInfo].musicModel.musicInfo forKey:PlayedMusicInfoMusicInfo];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
 }
 
 @end

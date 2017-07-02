@@ -17,4 +17,6 @@
 
 @property (nonatomic, strong) MusicModel *musicModel;
 
++(PlayingMusicInfo *)sharedMusicInfo;
+
 @end

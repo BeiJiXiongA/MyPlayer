@@ -9,6 +9,16 @@
 
 #import "PlayingMusicInfo.h"
 
+static PlayingMusicInfo *currentMusicInfo;
+
 @implementation PlayingMusicInfo
+
++(PlayingMusicInfo *)sharedMusicInfo
+{
+    if (!currentMusicInfo) {
+        currentMusicInfo = [[PlayingMusicInfo alloc] init];
+    }
+    return currentMusicInfo;;
+}
 
 @end

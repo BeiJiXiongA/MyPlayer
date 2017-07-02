@@ -31,6 +31,13 @@ alpha:1]
 
 #define  NAV_BG_COLOR  RGB(58, 122, 191)
 
+#define PlayMusic @"PlayMusic"
+
+#define PlayedMusicInfoDuration  @"playedMusicInfoDuration"
+#define PlayedMusicInfoPlayedTime @"playedMusicInfoPlayedTime"
+#define PlayedMusicInfoMusicName  @"playedMusicInfoMusicName"
+#define PlayedMusicInfoMusicInfo  @"PlayedMusicInfoMusicInfo"
+
 #import "UIView+Extention.h"
 #import "CatalogueTools.h"
 #import "MusicModel.h"

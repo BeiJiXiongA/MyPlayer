@@ -36,7 +36,7 @@ static MyMusicPlayer *musicPlayer;
 }
 
 #pragma mark - 播放
--(void)playMusic:(MusicModel *)musicModel
+-(void)playMusic:(MusicModel *)musicModel andAction:(void (^)(PlayingMusicInfo *musicInfo))playedAction
 {
     _currentMusicModel = musicModel;
     NSString *musicPath = [CatalogueTools getDocumentPathWithName:musicModel.musicName];
@@ -47,29 +47,77 @@ static MyMusicPlayer *musicPlayer;
         _timer = nil;
     }
     
-//    NSString *name = [[musicPath lastPathComponent] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    
     NSError *error = nil;
-    _player = [[AVAudioPlayer alloc] initWithData:[NSData dataWithContentsOfFile:musicPath] error:&error];
+    
+    NSData *data = [[NSFileManager defaultManager] contentsAtPath:musicPath];
+    
+    _player = [[AVAudioPlayer alloc] initWithData:data fileTypeHint:AVFileTypeMPEGLayer3 error:&error];
     
     _player.delegate = self;
     
     if ([_player prepareToPlay]) {
         [_player play];
-//        _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(progressRefresh) userInfo:nil repeats:YES];
+        _timer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(progressRefresh) userInfo:nil repeats:YES];
     }else{
         NSLog(@"error %@",error);
+        [self next];
     }
     
-//    currentDate = [NSDate dateWithTimeIntervalSinceReferenceDate:currentSec];
-//    currentTime = [timeFormatter stringFromDate:currentDate];
-//    leftDate = [NSDate dateWithTimeIntervalSinceReferenceDate:leftSec];
-//    leftTime = [timeFormatter stringFromDate:leftDate];
+    PlayingMusicInfo *musicInfo = [PlayingMusicInfo sharedMusicInfo];
+    musicInfo.musicDuration = _player.duration;
+    musicInfo.musicPlayedTime = 0;
+    musicInfo.musicModel = musicModel;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:PlayMusic object:musicInfo];
+    [self setPlayingInfoCenter];
+    
+    if (playedAction) {
+        
+    }
+}
+
+-(void)setPlayingInfoCenter
+{
+    PlayingMusicInfo *musicInfo = [PlayingMusicInfo sharedMusicInfo];
+    MusicModel *musicModel = [PlayingMusicInfo sharedMusicInfo].musicModel;
+    NSMutableDictionary *songDict=[NSMutableDictionary dictionary];
+    //歌名
+    [songDict setObject:musicModel.musicName forKey:MPMediaItemPropertyTitle];
+    //歌手名
+    if ([musicModel.musicInfo objectForKey:@"artist"]) {
+        [songDict setObject:[musicModel.musicInfo objectForKey:@"artist"] forKey:MPMediaItemPropertyArtist];
+    }
+    
+    //歌曲的总时间
+    [songDict setObject:@(musicInfo.musicDuration) forKeyedSubscript:MPMediaItemPropertyPlaybackDuration];
+    
+    if (musicInfo.musicPlayedTime > 0) {
+        [songDict setObject:@(musicInfo.musicPlayedTime) forKeyedSubscript:MPNowPlayingInfoPropertyElapsedPlaybackTime];
+    }
+    
+    //设置歌曲图片
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"defaultimage"]) {
+        NSData *imageData = [[NSUserDefaults standardUserDefaults] objectForKey:@"defaultimage"];
+        MPMediaItemArtwork *imageItem=[[MPMediaItemArtwork alloc]initWithImage:[UIImage imageWithData:imageData]];
+        [songDict setObject:imageItem forKey:MPMediaItemPropertyArtwork];
+    }
+    //设置控制中心歌曲信息
+    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:songDict];
+}
+
+-(void)playMusic:(MusicModel *)musicModel
+{
+    [self playMusic:musicModel andAction:nil];
 }
 
 -(void)progressRefresh
 {
-    NSLog(@"%f",_player.currentTime);
+    PlayingMusicInfo *musicInfo = [PlayingMusicInfo sharedMusicInfo];
+    musicInfo.musicDuration = _player.duration;
+    musicInfo.musicPlayedTime = _player.currentTime;
+    if (self.processChanged) {
+        self.processChanged();
+    }
 }
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
@@ -77,9 +125,24 @@ static MyMusicPlayer *musicPlayer;
     [self next];
 }
 
+-(NSInteger)getCurrentMusicIndex
+{
+    __block NSInteger index = 0;
+    if ([_musicList containsObject:_currentMusicModel]) {
+        index = [_musicList indexOfObject:_currentMusicModel];
+    }else{
+        [_musicList enumerateObjectsUsingBlock:^(MusicModel *musicModel, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([musicModel.musicName isEqualToString:_currentMusicModel.musicName]) {
+                index = idx;
+            }
+        }];
+    }
+    return index;
+}
+
 -(void)next
 {
-    NSInteger index = [_musicList indexOfObject:_currentMusicModel];
+    NSInteger index = [self getCurrentMusicIndex];
     if (index == _musicList.count - 1) {
         _currentMusicModel = [_musicList firstObject];
     }else{
@@ -91,25 +154,52 @@ static MyMusicPlayer *musicPlayer;
 
 -(void)pre
 {
-    NSInteger index = [_musicList indexOfObject:_currentMusicModel];
-    if (index == _musicList.count - 1) {
-        _currentMusicModel = [_musicList firstObject];
+    NSInteger index = [self getCurrentMusicIndex];
+    if (index == 0) {
+        _currentMusicModel = [_musicList lastObject];
     }else{
         _currentMusicModel = [_musicList objectAtIndex:--index];
     }
     [self playMusic:_currentMusicModel];
 }
 
+-(void)pause
+{
+    [_player pause];
+}
+
+-(void)resumePlay
+{
+    [_player play];
+}
+
+-(void)playAtTime:(NSTimeInterval)seconds
+{
+    [_player setCurrentTime:seconds];
+    [PlayingMusicInfo sharedMusicInfo].musicPlayedTime = seconds;
+    [self setPlayingInfoCenter];
+}
+
 -(void)playClick:(void (^)(BOOL isPlaying))action
 {
     if ([_player isPlaying]) {
-        [_player stop];
+        [self pause];
     }else{
-        [_player play];
+        [self resumePlay];
     }
     if (action) {
         action(_player.isPlaying);
     }
+}
+
+-(UIImage *)getDefaultImage
+{
+    UIImage *image = nil;
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"defaultimage"]) {
+        NSData *imageData = [[NSUserDefaults standardUserDefaults] objectForKey:@"defaultimage"];
+        image = [UIImage imageWithData:imageData];
+    }
+    return image;
 }
 
 @end

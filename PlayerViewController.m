@@ -18,7 +18,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.view.backgroundColor = [UIColor orangeColor];
+    self.view.backgroundColor = [UIColor blackColor];
     
     self.title = _currentMusicModel.musicName;
     
@@ -26,11 +26,32 @@
     controlView.musicList = _musicList;
     controlView.playedMusicModel = _currentMusicModel;
     [self.view addSubview:controlView];
+    
+    if ([[MyMusicPlayer sharedMusicPlayer] getDefaultImage]){
+        UIImageView *defaultImageView = [[UIImageView alloc] init];
+        defaultImageView.frame = CGRectMake(40, controlView.top -  WIDTH + 40*2-50, WIDTH - 40*2, WIDTH - 40*2);
+        defaultImageView.layer.cornerRadius = 5;
+        defaultImageView.contentMode = UIViewContentModeScaleAspectFill;
+        defaultImageView.clipsToBounds = YES;
+        defaultImageView.layer.borderColor = [UIColor darkGrayColor].CGColor;
+        defaultImageView.layer.borderWidth = 5;
+        [self.view addSubview:defaultImageView];
+        defaultImageView.image = [[MyMusicPlayer sharedMusicPlayer] getDefaultImage];
+    }
+    
     if (![MyMusicPlayer sharedMusicPlayer].currentMusicModel ||
         ![_currentMusicModel.musicName isEqualToString:[MyMusicPlayer sharedMusicPlayer].currentMusicModel.musicName]) {
         [controlView play];
     }
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receivePlayMusicNotification:) name:PlayMusic object:nil];
+}
+
+-(void)receivePlayMusicNotification:(NSNotification *)notification
+{
+    if ([notification.object isKindOfClass:[PlayingMusicInfo class]]) {
+        PlayingMusicInfo *musicInfo = (PlayingMusicInfo *)notification.object;
+        self.title = musicInfo.musicModel.musicName;
+    }
 }
 
 - (void)didReceiveMemoryWarning {

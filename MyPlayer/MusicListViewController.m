@@ -6,10 +6,11 @@
 //  Copyright © 2017年 zw. All rights reserved.
 //
 
+#import <AVFoundation/AVFoundation.h>
 #import "MusicListViewController.h"
 #import "ListTableViewCell.h"
 #import "PlayerViewController.h"
-#import <AVFoundation/AVFoundation.h>
+#import "SettingViewController.h"
 
 
 @interface MusicListViewController ()<UITableViewDelegate, UITableViewDataSource>
@@ -32,10 +33,46 @@
     _listTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT) style:UITableViewStylePlain];
     _listTableView.delegate = self;
     _listTableView.dataSource = self;
+    _listTableView.backgroundColor = [UIColor blackColor];
     [self.view addSubview:_listTableView];
     _listTableView.tableFooterView = [[UIView alloc] init];
     
+    UIBarButtonItem *leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"设置" style:UIBarButtonItemStylePlain target:self action:@selector(toSettingView)];
+    self.navigationItem.leftBarButtonItem = leftBarButtonItem;
+    
+    UIBarButtonItem *rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"正在播放" style:UIBarButtonItemStylePlain target:self action:@selector(toPlayingView)];
+    self.navigationItem.rightBarButtonItem = rightBarButtonItem;
+    
     [self freshList];
+}
+
+-(void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    PlayingMusicInfo *currentMusicInfo = [PlayingMusicInfo sharedMusicInfo];
+    if (currentMusicInfo.musicModel) {
+        self.navigationItem.rightBarButtonItem.enabled = YES;
+    }else{
+        self.navigationItem.rightBarButtonItem.enabled = NO;
+    }
+}
+
+-(void)toPlayingView
+{
+    [self toPlayingView:[PlayingMusicInfo sharedMusicInfo].musicModel];
+}
+
+-(void)toSettingView
+{
+    SettingViewController *settingViewController = [[SettingViewController alloc] init];
+    [self.navigationController pushViewController:settingViewController animated:YES];
+}
+
+-(void)toPlayingView:(MusicModel *)model
+{
+    PlayerViewController *player = [[PlayerViewController alloc] init];
+    player.currentMusicModel = model;
+    [self.navigationController pushViewController:player animated:YES];
 }
 
 -(void)freshList
@@ -46,14 +83,19 @@
     NSError *error = nil;
     NSArray *documentFiles = [_fileManager contentsOfDirectoryAtPath:docDir error:&error];
     [documentFiles enumerateObjectsUsingBlock:^(NSString *musicName, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSString *musicPath = [CatalogueTools getDocumentPathWithName:musicName];
-        MusicModel *model = [[MusicModel alloc] init];
-        model.musicName = musicName;
-        model.musicInfo = [self getInfoWithMusicPath:musicPath];
-        [_listArray addObject:model];
+        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+            NSString *musicPath = [CatalogueTools getDocumentPathWithName:musicName];
+            MusicModel *model = [[MusicModel alloc] init];
+            model.musicName = musicName;
+            model.musicInfo = [self getInfoWithMusicPath:musicPath];
+            [_listArray addObject:model];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [MyMusicPlayer sharedMusicPlayer].musicList = _listArray;
+                [_listTableView reloadData];
+            });
+        });
     }];
-    [MyMusicPlayer sharedMusicPlayer].musicList = _listArray;
-    [_listTableView reloadData];
+    
 }
 
 - (void)didReceiveMemoryWarning {
@@ -79,7 +121,7 @@
         listCell = [[ListTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIder];
     }
     MusicModel *model = [_listArray objectAtIndex:indexPath.row];
-    listCell.nameLabel.text = [model.musicName stringByDeletingPathExtension];
+    listCell.nameLabel.text = [NSString stringWithFormat:@"%ld.%@",indexPath.row,[model.musicName stringByDeletingPathExtension]];
     NSDictionary *infoDict = model.musicInfo;
     listCell.artistLabel.text = [infoDict objectForKey:@"artist"];
     listCell.albumLabel.text = [infoDict objectForKey:@"albumName"];
@@ -89,10 +131,7 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     MusicModel *model = [_listArray objectAtIndex:indexPath.row];
-    PlayerViewController *player = [[PlayerViewController alloc] init];
-    player.currentMusicModel = model;
-    player.musicList = _listArray;
-    [self.navigationController pushViewController:player animated:YES];
+    [self toPlayingView:model];
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 

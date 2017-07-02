@@ -15,18 +15,26 @@
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
+        
+        self.backgroundColor = [UIColor blackColor];
+        
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
+        
         _nameLabel = [[UILabel alloc] init];
         _nameLabel.frame = CGRectMake(12, 12, WIDTH - 100, 20);
         _nameLabel.font = [UIFont systemFontOfSize:16];
+        _nameLabel.textColor = [UIColor whiteColor];
         [self.contentView addSubview:_nameLabel];
         
         _artistLabel = [[UILabel alloc] init];
         _artistLabel.frame = CGRectMake(_nameLabel.left, _nameLabel.bottom + 5, (WIDTH - 24)/2-6, 20);
+        _artistLabel.textColor = [UIColor whiteColor];
         _artistLabel.font = [UIFont systemFontOfSize:14];
         [self.contentView addSubview:_artistLabel];
         
         _albumLabel = [[UILabel alloc] init];
         _albumLabel.frame = CGRectMake(_artistLabel.right+6, _nameLabel.bottom + 5, _artistLabel.width, 20);
+        _albumLabel.textColor = [UIColor whiteColor];
         _albumLabel.textAlignment = NSTextAlignmentRight;
         _albumLabel.font = [UIFont systemFontOfSize:13];
         [self.contentView addSubview:_albumLabel];
