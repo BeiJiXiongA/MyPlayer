@@ -13,10 +13,12 @@
 #import "SettingViewController.h"
 
 
-@interface MusicListViewController ()<UITableViewDelegate, UITableViewDataSource>
+@interface MusicListViewController ()<UITableViewDelegate, UITableViewDataSource,UISearchBarDelegate>
 @property (nonatomic, strong) UITableView *listTableView;
 @property (nonatomic, strong) NSMutableArray *listArray;
+@property (nonatomic, strong) NSMutableArray *searchResultArray;
 @property (nonatomic, strong) NSFileManager *fileManager;
+@property (nonatomic, strong) UISearchBar *musicSearchBar;
 @end
 
 @implementation MusicListViewController
@@ -28,6 +30,7 @@
     self.title = @"音乐列表";
     
     _listArray = [[NSMutableArray alloc] init];
+    _searchResultArray = [[NSMutableArray alloc] init];
     _fileManager = [NSFileManager defaultManager];
     
     _listTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT) style:UITableViewStylePlain];
@@ -105,8 +108,32 @@
     // Dispose of any resources that can be recreated.
 }
 
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 44;
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    //搜索框
+    UIView *searchBgView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, WIDTH, 44)];
+    searchBgView.backgroundColor = [UIColor darkGrayColor];
+    
+    _musicSearchBar = [[UISearchBar alloc] initWithFrame:searchBgView.bounds];
+    _musicSearchBar.barStyle = UIBarStyleBlack;
+    _musicSearchBar.placeholder = @"输入关键字搜索...";
+    _musicSearchBar.delegate = self;
+    _musicSearchBar.returnKeyType = UIReturnKeySearch;
+    _musicSearchBar.backgroundColor = [UIColor darkGrayColor];
+    [searchBgView addSubview:_musicSearchBar];
+    return searchBgView;
+}
+
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+    if (_searchResultArray.count > 0) {
+        return _searchResultArray.count;
+    }
     return _listArray.count;
 }
 
@@ -122,7 +149,7 @@
     if (!listCell) {
         listCell = [[ListTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIder];
     }
-    MusicModel *model = [_listArray objectAtIndex:indexPath.row];
+    MusicModel *model = [self getMusicModelWithRow:indexPath.row];;
     listCell.nameLabel.text = [NSString stringWithFormat:@"%ld.%@",indexPath.row,[model.musicName stringByDeletingPathExtension]];
     NSDictionary *infoDict = model.musicInfo;
     listCell.artistLabel.text = [infoDict objectForKey:@"artist"];
@@ -143,7 +170,10 @@
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        MusicModel *model = [_listArray objectAtIndex:indexPath.row];
+        MusicModel *model = [self getMusicModelWithRow:indexPath.row];
+        if (_searchResultArray.count > 0) {
+            [_searchResultArray removeObject:model];
+        }
         [_listArray removeObject:model];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
         NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -158,40 +188,86 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    MusicModel *model = [_listArray objectAtIndex:indexPath.row];
+    MusicModel *model = [self getMusicModelWithRow:indexPath.row];
     [self toPlayingView:model];
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+-(MusicModel *)getMusicModelWithRow:(NSInteger)row
+{
+    MusicModel *model = nil;
+    if (_searchResultArray.count > 0) {
+        model = [_searchResultArray objectAtIndex:row];
+    }else{
+        model = [_listArray objectAtIndex:row];
+    }
+    return model;
+}
+
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    [_musicSearchBar resignFirstResponder];
+}
+
+-(BOOL)searchBarShouldBeginEditing:(UISearchBar *)searchBar
+{
+    NSLog(@"%s",__func__);
+    _musicSearchBar.showsCancelButton = YES;
+    return YES;
+}
+
+-(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+{
+     NSLog(@"%s",__func__);
+}
+
+-(void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+{
+    NSLog(@"%s",__func__);
+    [_musicSearchBar resignFirstResponder];
+    
+    [_listArray enumerateObjectsUsingBlock:^(MusicModel *musicModel, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([musicModel.musicName rangeOfString:searchBar.text].length > 0) {
+            [_searchResultArray addObject:musicModel];
+        }
+    }];
+    [_listTableView reloadData];
+}
+
+-(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
+{
+     NSLog(@"%s",__func__);
+    _musicSearchBar.showsCancelButton = NO;
+    [_musicSearchBar resignFirstResponder];
+    _musicSearchBar.text = @"";
+    [_searchResultArray removeAllObjects];
+    [_listTableView reloadData];
 }
 
 -(NSDictionary *)getInfoWithMusicPath:(NSString *)musicPath
 {
     AVURLAsset *mp3Asset = [AVURLAsset URLAssetWithURL:[NSURL fileURLWithPath:musicPath] options:nil];
-    NSLog(@"%@",[mp3Asset availableMetadataFormats]);
+//    NSLog(@"%@",[mp3Asset availableMetadataFormats]);
     NSMutableDictionary *infoDict = [[NSMutableDictionary alloc] init];
     for (NSString *format  in [mp3Asset availableMetadataFormats]) {
         
-        NSLog(@"format type = %@",format);
         for (AVMetadataItem *metadataItem in [mp3Asset metadataForFormat:format]) {
-            NSLog(@"commonKey = %@",metadataItem.commonKey);
             
             if([metadataItem.commonKey isEqualToString:@"title"])
             {
                 NSString *title = (NSString *)metadataItem.value;
-                NSLog(@"title: %@",title);
                 
                 [infoDict setObject:title forKey:@"title"];
             }
             else if([metadataItem.commonKey isEqualToString:@"artist"])
             {
                 NSString *artist = (NSString *)metadataItem.value;
-                NSLog(@"artist: %@",artist);
                 
                 [infoDict setObject:artist forKey:@"artist"];
             }
             else if([metadataItem.commonKey isEqualToString:@"albumName"])
             {
                 NSString *albumName = (NSString *)metadataItem.value;
-                NSLog(@"albumName: %@",albumName);
                 
                 [infoDict setObject:albumName forKey:@"albumName"];
             }
