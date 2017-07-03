@@ -126,6 +126,7 @@
                 break;
             case UIEventSubtypeRemoteControlTogglePlayPause:
                 order=UIEventSubtypeRemoteControlTogglePlayPause;
+                [[MyMusicPlayer sharedMusicPlayer] pause];
                 break;
             default:
                 order=-1;

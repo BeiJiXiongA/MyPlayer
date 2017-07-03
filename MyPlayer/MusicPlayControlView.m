@@ -115,6 +115,7 @@
         _progressLeftLabel.text = [self getTimeStringWithSeconds:0];
         _progressRightLabel.text = [self getTimeStringWithSeconds:musicInfo.musicDuration];
         _progressSlider.value = musicInfo.musicPlayedTime/musicInfo.musicDuration;
+        [playButton setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateNormal];
     }
 }
 
