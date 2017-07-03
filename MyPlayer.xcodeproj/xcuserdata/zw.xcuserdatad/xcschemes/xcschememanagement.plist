@@ -9,6 +9,11 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>SimpleMusicWidget.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
@@ -23,6 +28,11 @@
 			<true/>
 		</dict>
 		<key>DB2783861CA699310070E875</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>E42075201F0915C700A2846C</key>
 		<dict>
 			<key>primary</key>
 			<true/>
