@@ -20,8 +20,21 @@
         
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
+        _iconImageView = [[UIImageView alloc] init];
+        _iconImageView.frame = CGRectMake(12, 12, 46, 46);
+        _iconImageView.contentMode = UIViewContentModeScaleAspectFill;
+        _iconImageView.layer.cornerRadius = 3;
+        _iconImageView.layer.borderColor = [UIColor darkGrayColor].CGColor;
+        _iconImageView.layer.borderWidth = 3;
+        _iconImageView.clipsToBounds = YES;
+        [self.contentView addSubview:_iconImageView];
+        
+        if ([[MyMusicPlayer sharedMusicPlayer] getDefaultImage]) {
+            _iconImageView.image = [[MyMusicPlayer sharedMusicPlayer] getDefaultImage];
+        }
+        
         _nameLabel = [[UILabel alloc] init];
-        _nameLabel.frame = CGRectMake(12, 12, WIDTH - 100, 20);
+        _nameLabel.frame = CGRectMake(_iconImageView.right+10, 12, WIDTH - 100, 20);
         _nameLabel.font = [UIFont systemFontOfSize:16];
         _nameLabel.textColor = [UIColor whiteColor];
         [self.contentView addSubview:_nameLabel];
