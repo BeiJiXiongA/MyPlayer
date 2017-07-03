@@ -87,6 +87,7 @@
     [session setActive:YES error:nil];
     //允许应用程序接收远程控制
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    
     //设置后台任务ID
     UIBackgroundTaskIdentifier newTaskId=UIBackgroundTaskInvalid;
     newTaskId=[[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:nil];
@@ -105,10 +106,10 @@
         switch (event.subtype) {
             case UIEventSubtypeRemoteControlPause:
                 order=UIEventSubtypeRemoteControlPause;
-                [[MyMusicPlayer sharedMusicPlayer] pause];
+                [[MyMusicPlayer sharedMusicPlayer] pause];//101
                 break;
             case UIEventSubtypeRemoteControlPlay:
-                order=UIEventSubtypeRemoteControlPlay;
+                order=UIEventSubtypeRemoteControlPlay;  //100
                 if ([PlayingMusicInfo sharedMusicInfo].musicModel) {
                     [[MyMusicPlayer sharedMusicPlayer] resumePlay];
                 }else{
@@ -128,8 +129,13 @@
                 order=UIEventSubtypeRemoteControlTogglePlayPause;
                 [[MyMusicPlayer sharedMusicPlayer] pause];
                 break;
+            case UIEventSubtypeRemoteControlBeginSeekingForward:{
+                NSLog(@"单击，再按下不放：108");
+            }break;
+                
+            case UIEventSubtypeRemoteControlEndSeekingForward:{
+                NSLog(@"单击，再按下不放，松开时：109");                 }break;
             default:
-                order=-1;
                 break;
         }
         NSDictionary *orderDict=@{@"order":@(order)};
