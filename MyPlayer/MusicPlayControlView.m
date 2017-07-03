@@ -10,7 +10,6 @@
 
 @interface MusicPlayControlView ()
 {
-    UIButton *playButton;
     UIButton *backwordButton;
     UIButton *forwardButton;
     
@@ -18,6 +17,7 @@
     
     NSDateFormatter *timeFormatter;
 }
+@property (nonatomic, strong) UIButton *playButton;
 @property (nonatomic, strong) UILabel *progressLeftLabel;
 @property (nonatomic, strong) UILabel *progressRightLabel;
 @property (nonatomic, strong) UISlider *progressSlider;
@@ -62,21 +62,21 @@
         _progressRightLabel.backgroundColor = [UIColor clearColor];
         [self addSubview:_progressRightLabel];
         
-        playButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        playButton.backgroundColor = [UIColor clearColor];
+        _playButton = [UIButton buttonWithType:UIButtonTypeCustom];
+        _playButton.backgroundColor = [UIColor clearColor];
         if ([MyMusicPlayer sharedMusicPlayer].player.isPlaying) {
-            [playButton setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateNormal];
+            [_playButton setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateNormal];
         }else{
-            [playButton setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
+            [_playButton setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
         }
         
-        playButton.frame = CGRectMake(self.width/2 - 18.5, _progressSlider.top+50,  37, 37);
-        [playButton addTarget:self action:@selector(controlMusic:) forControlEvents:UIControlEventTouchUpInside];
-        [self addSubview:playButton];
+        _playButton.frame = CGRectMake(self.width/2 - 18.5, _progressSlider.top+50,  37, 37);
+        [_playButton addTarget:self action:@selector(controlMusic:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:_playButton];
         
         backwordButton = [UIButton buttonWithType:UIButtonTypeCustom];
         [backwordButton setImage:[UIImage imageNamed:@"prev"] forState:UIControlStateNormal];
-        backwordButton.frame = CGRectMake(playButton.left - 57, playButton.top, 37, 37);
+        backwordButton.frame = CGRectMake(_playButton.left - 57, _playButton.top, 37, 37);
         [backwordButton addTarget:self action:@selector(preMusic:) forControlEvents:UIControlEventTouchUpInside];
         backwordButton.backgroundColor = [UIColor clearColor];
         [self addSubview:backwordButton];
@@ -85,13 +85,20 @@
         [forwardButton setImage:[UIImage imageNamed:@"next"] forState:UIControlStateNormal];
         [forwardButton addTarget:self action:@selector(nextMusic:) forControlEvents:UIControlEventTouchUpInside];
         forwardButton.backgroundColor = [UIColor clearColor];
-        forwardButton.frame = CGRectMake(playButton.right + 20, playButton.top,  37, 37);
+        forwardButton.frame = CGRectMake(_playButton.right + 20, _playButton.top,  37, 37);
         [self addSubview:forwardButton];
         
         __weak MusicPlayControlView *weakSelf = self;
         myMusicPlayer = [MyMusicPlayer sharedMusicPlayer];
         myMusicPlayer.processChanged = ^(){
             [weakSelf progressChanged];
+        };
+        myMusicPlayer.playStateChanged = ^(BOOL isPlaying){
+            if (isPlaying) {
+                [weakSelf.playButton setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateNormal];
+            }else{
+                [weakSelf.playButton setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
+            }
         };
         
         PlayingMusicInfo *musicInfo = [PlayingMusicInfo sharedMusicInfo];
@@ -115,7 +122,7 @@
         _progressLeftLabel.text = [self getTimeStringWithSeconds:0];
         _progressRightLabel.text = [self getTimeStringWithSeconds:musicInfo.musicDuration];
         _progressSlider.value = musicInfo.musicPlayedTime/musicInfo.musicDuration;
-        [playButton setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateNormal];
+        [_playButton setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateNormal];
     }
 }
 
@@ -165,9 +172,9 @@
 {
     [myMusicPlayer playClick:^(BOOL isPlaying){
         if (isPlaying) {
-            [playButton setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateNormal];
+            [_playButton setImage:[UIImage imageNamed:@"pause"] forState:UIControlStateNormal];
         }else{
-            [playButton setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
+            [_playButton setImage:[UIImage imageNamed:@"play"] forState:UIControlStateNormal];
         }
     }];
 }

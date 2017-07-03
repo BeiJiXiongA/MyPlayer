@@ -43,10 +43,12 @@ static MyMusicPlayer *musicPlayer;
         case AVAudioSessionRouteChangeReasonNewDeviceAvailable:
             NSLog(@"AVAudioSessionRouteChangeReasonNewDeviceAvailable");
             NSLog(@"耳机插入");
-            
+            [self resumePlay];
             break;
         case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:
-            NSLog(@"AVAudioSessionRouteChangeReasonOldDeviceUnavailable");      NSLog(@"耳机拔出，停止播放操作");
+            NSLog(@"AVAudioSessionRouteChangeReasonOldDeviceUnavailable");
+            NSLog(@"耳机拔出，停止播放操作");
+            [self pause];
             break;
             
         case AVAudioSessionRouteChangeReasonCategoryChange:            // called at start - also when other audio wants to play
@@ -194,12 +196,18 @@ static MyMusicPlayer *musicPlayer;
 
 -(void)pause
 {
-    [_player pause];
+    [_player stop];
+    if (self.playStateChanged) {
+        self.playStateChanged(NO);
+    }
 }
 
 -(void)resumePlay
 {
     [_player play];
+    if (self.playStateChanged) {
+        self.playStateChanged(YES);
+    }
 }
 
 -(void)playAtTime:(NSTimeInterval)seconds

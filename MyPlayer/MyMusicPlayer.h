@@ -18,6 +18,7 @@
 @property (nonatomic, strong) NSTimer *timer;
 @property (nonatomic, strong) NSArray *musicList;
 @property (nonatomic, strong) MusicModel *currentMusicModel;
+@property (nonatomic, copy) void (^playStateChanged)(BOOL isPlaying);
 
 @property (nonatomic, copy) void (^processChanged)(void);
 
