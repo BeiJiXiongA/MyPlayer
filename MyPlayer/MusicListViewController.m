@@ -19,6 +19,7 @@
 @property (nonatomic, strong) NSMutableArray *searchResultArray;
 @property (nonatomic, strong) NSFileManager *fileManager;
 @property (nonatomic, strong) UISearchBar *musicSearchBar;
+@property (nonatomic, strong) UIImage *defaultImage;
 @end
 
 @implementation MusicListViewController
@@ -29,11 +30,14 @@
     self.view.backgroundColor = [UIColor whiteColor];
     self.title = @"音乐列表";
     
+    _defaultImage = [[MyMusicPlayer sharedMusicPlayer] getDefaultImage];
+    
     _listArray = [[NSMutableArray alloc] init];
     _searchResultArray = [[NSMutableArray alloc] init];
     _fileManager = [NSFileManager defaultManager];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receivePlayMusicNotification:) name:PlayMusic object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadData) name:MusicAlbumImageChanged object:nil];
     
     _listTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT) style:UITableViewStylePlain];
     _listTableView.delegate = self;
@@ -112,6 +116,11 @@
     
 }
 
+-(void)reloadData
+{
+    [_listTableView reloadData];
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -186,6 +195,16 @@
         }
         [tableView reloadData];
     };
+    dispatch_async(dispatch_get_global_queue(0, 0), ^{
+        UIImage *musicImage = _defaultImage;
+        if ([[NSFileManager defaultManager] fileExistsAtPath:[CatalogueTools getImageDirectoryPath:[model.musicName stringByDeletingPathExtension]]]) {
+            musicImage = [UIImage imageWithContentsOfFile:[CatalogueTools getImageDirectoryPath:[model.musicName stringByDeletingPathExtension]]];
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [listCell.iconImageView setImage:musicImage];
+        });
+    });
+    
     return listCell;
 }
 

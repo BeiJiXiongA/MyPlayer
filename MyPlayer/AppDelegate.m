@@ -29,7 +29,7 @@
         [self playTerminateMusic];
         [[MyMusicPlayer sharedMusicPlayer] pause];
     }
-    
+    [self createImageDirectory];
     MusicListViewController *list = [[MusicListViewController alloc] init];
     UINavigationController *listNav = [[UINavigationController alloc] initWithRootViewController:list];
     UINavigationBar *bar = [UINavigationBar appearance];
@@ -46,6 +46,19 @@
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     return YES;
+}
+
+-(void)createImageDirectory
+{
+    NSError *error = nil;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if ([fileManager fileExistsAtPath:[CatalogueTools getDocumentPathWithName:@"images"]]) {
+        NSLog(@"images exist");
+    }else if([fileManager createDirectoryAtPath:[CatalogueTools getDocumentPathWithName:@"images"] withIntermediateDirectories:NO attributes:nil error:&error]){
+        NSLog(@"images create success!");
+    }else{
+        NSLog(@"images create failed %@",error);
+    }
 }
 
 -(void)playTerminateMusic

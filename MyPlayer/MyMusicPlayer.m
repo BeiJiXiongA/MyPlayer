@@ -32,6 +32,8 @@ static MyMusicPlayer *musicPlayer;
         
         [[AVAudioSession sharedInstance] setActive:YES error:nil];//创建单例对象并且使其设置为活跃状态.
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioRouteChangeListenerCallback:)   name:AVAudioSessionRouteChangeNotification object:nil];//设置通知
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setPlayingInfoCenter) name:MusicAlbumImageChanged object:nil];
     }
     return self;
 }
@@ -127,7 +129,12 @@ static MyMusicPlayer *musicPlayer;
     }
     
     //设置歌曲图片
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"defaultimage"]) {
+    
+    if ([[NSFileManager defaultManager] fileExistsAtPath:[CatalogueTools getImageDirectoryPath:[musicModel.musicName stringByDeletingPathExtension]]]) {
+        UIImage *musicImage = [UIImage imageWithContentsOfFile:[CatalogueTools getImageDirectoryPath:[musicModel.musicName stringByDeletingPathExtension]]];
+        MPMediaItemArtwork *imageItem=[[MPMediaItemArtwork alloc]initWithImage:musicImage];
+        [songDict setObject:imageItem forKey:MPMediaItemPropertyArtwork];
+    }else if ([[NSUserDefaults standardUserDefaults] objectForKey:@"defaultimage"]) {
         NSData *imageData = [[NSUserDefaults standardUserDefaults] objectForKey:@"defaultimage"];
         MPMediaItemArtwork *imageItem=[[MPMediaItemArtwork alloc]initWithImage:[UIImage imageWithData:imageData]];
         [songDict setObject:imageItem forKey:MPMediaItemPropertyArtwork];

@@ -10,6 +10,8 @@
 
 @interface CatalogueTools : NSObject
 
++(NSString *)getImageDirectoryPath:(NSString *)fileName;
+
 + (NSString *)getDocumentPathWithName:(NSString *)fileName;
 
 @end

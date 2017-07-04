@@ -19,6 +19,11 @@
     return filePath;
 }
 
++(NSString *)getImageDirectoryPath:(NSString *)fileName
+{
+    return [NSString stringWithFormat:@"%@/%@.jpeg",[self getDocumentPathWithName:@"images"],fileName];
+}
+
 + (NSString *)getDocumentPath
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
