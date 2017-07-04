@@ -30,6 +30,7 @@ blue:(1.0*(__b)/255)\
 alpha:1]
 
 #define  NAV_BG_COLOR  RGB(58, 122, 191)
+#define  PROGRESS_COLOR  RGB(58, 193, 126)
 
 #define PlayMusic @"PlayMusic"
 

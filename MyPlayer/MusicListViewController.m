@@ -33,6 +33,8 @@
     _searchResultArray = [[NSMutableArray alloc] init];
     _fileManager = [NSFileManager defaultManager];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(receivePlayMusicNotification:) name:PlayMusic object:nil];
+    
     _listTableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, WIDTH, HEIGHT) style:UITableViewStylePlain];
     _listTableView.delegate = self;
     _listTableView.dataSource = self;
@@ -57,6 +59,13 @@
         self.navigationItem.rightBarButtonItem.enabled = YES;
     }else{
         self.navigationItem.rightBarButtonItem.enabled = NO;
+    }
+}
+
+-(void)receivePlayMusicNotification:(NSNotification *)notification
+{
+    if ([notification.object isKindOfClass:[PlayingMusicInfo class]]) {
+        [_listTableView reloadData];
     }
 }
 
@@ -154,6 +163,29 @@
     NSDictionary *infoDict = model.musicInfo;
     listCell.artistLabel.text = [infoDict objectForKey:@"artist"];
     listCell.albumLabel.text = [infoDict objectForKey:@"albumName"];
+    if ([PlayingMusicInfo sharedMusicInfo].musicModel &&  [[PlayingMusicInfo sharedMusicInfo].musicModel.musicName isEqualToString:model.musicName]) {
+        listCell.progressLayer.hidden = NO;
+        if ([MyMusicPlayer sharedMusicPlayer].player.isPlaying) {
+            [listCell.playStatusButton setImage:[UIImage imageNamed:@"list_pause"] forState:UIControlStateNormal];
+        }else{
+            [listCell.playStatusButton setImage:[UIImage imageNamed:@"list_play"] forState:UIControlStateNormal];
+        }
+    }else{
+        listCell.progressLayer.hidden = YES;
+        [listCell.playStatusButton setImage:[UIImage imageNamed:@"list_play"] forState:UIControlStateNormal];
+    }
+    listCell.playButtonClick = ^{
+        if ([PlayingMusicInfo sharedMusicInfo].musicModel &&  [[PlayingMusicInfo sharedMusicInfo].musicModel.musicName isEqualToString:model.musicName]) {
+            if ([MyMusicPlayer sharedMusicPlayer].player.isPlaying) {
+                [[MyMusicPlayer sharedMusicPlayer] pause];
+            }else{
+                [[MyMusicPlayer sharedMusicPlayer] resumePlay];
+            }
+        }else{
+             [[MyMusicPlayer sharedMusicPlayer] playMusic:model];
+        }
+        [tableView reloadData];
+    };
     return listCell;
 }
 

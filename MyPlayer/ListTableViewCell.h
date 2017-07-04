@@ -9,8 +9,13 @@
 #import <UIKit/UIKit.h>
 
 @interface ListTableViewCell : UITableViewCell
+
+@property (nonatomic, strong) CALayer *progressLayer;
 @property (nonatomic, strong) UIImageView *iconImageView;
+@property (nonatomic, strong) UIButton *playStatusButton;
 @property (nonatomic, strong) UILabel *nameLabel;
 @property (nonatomic, strong) UILabel *artistLabel;
 @property (nonatomic, strong) UILabel *albumLabel;
+@property (nonatomic, copy) void (^playButtonClick)(void);
+
 @end
