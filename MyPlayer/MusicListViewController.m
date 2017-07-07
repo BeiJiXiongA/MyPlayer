@@ -276,8 +276,7 @@
 -(void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
 {
     NSLog(@"%s",__func__);
-    [_musicSearchBar resignFirstResponder];
-    
+    [_searchResultArray removeAllObjects];
     [_listArray enumerateObjectsUsingBlock:^(MusicModel *musicModel, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([musicModel.musicName rangeOfString:searchBar.text].length > 0) {
             [_searchResultArray addObject:musicModel];

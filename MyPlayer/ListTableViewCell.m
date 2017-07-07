@@ -21,7 +21,7 @@
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
         _progressLayer = [CALayer layer];
-        _progressLayer.frame = CGRectMake(0, 0, WIDTH/2, 70);
+        _progressLayer.frame = CGRectMake(0, 0, WIDTH, 70);
         _progressLayer.backgroundColor = [PROGRESS_COLOR colorWithAlphaComponent:0.3].CGColor;
         _progressLayer.hidden = YES;
         [self.contentView.layer addSublayer:_progressLayer];
