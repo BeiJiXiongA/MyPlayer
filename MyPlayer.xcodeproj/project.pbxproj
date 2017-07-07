@@ -669,7 +669,7 @@
 				CODE_SIGN_ENTITLEMENTS = SimpleMusicWidget/SimpleMusicWidget.entitlements;
 				DEVELOPMENT_TEAM = X2AB8TRR33;
 				INFOPLIST_FILE = SimpleMusicWidget/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ZW.BJXA.MyPlayer.SimpleMusicWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -684,7 +684,7 @@
 				CODE_SIGN_ENTITLEMENTS = SimpleMusicWidget/SimpleMusicWidget.entitlements;
 				DEVELOPMENT_TEAM = X2AB8TRR33;
 				INFOPLIST_FILE = SimpleMusicWidget/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = ZW.BJXA.MyPlayer.SimpleMusicWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";

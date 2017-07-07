@@ -20,10 +20,7 @@
     // Do any additional setup after loading the view from its nib.
     
     self.preferredContentSize = CGSizeMake(0, 200);
-    
-    self.view.backgroundColor = [UIColor orangeColor];
-    
-    
+        
 }
 
 

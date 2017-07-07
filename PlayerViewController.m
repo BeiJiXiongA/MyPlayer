@@ -43,9 +43,9 @@
         [self.view addSubview:_defaultImageView];
         _defaultImageView.image = [[MyMusicPlayer sharedMusicPlayer] getDefaultImage];
         
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(selectImage)];
+        UILongPressGestureRecognizer *longGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(selectImage)];
         _defaultImageView.userInteractionEnabled = YES;
-        [_defaultImageView addGestureRecognizer:tap];
+        [_defaultImageView addGestureRecognizer:longGesture];
         
         if ([fileManager fileExistsAtPath:[CatalogueTools getImageDirectoryPath:[self.currentMusicModel.musicName stringByDeletingPathExtension]]]) {
             UIImage *musicImage = [UIImage imageWithContentsOfFile:[CatalogueTools getImageDirectoryPath:[self.currentMusicModel.musicName stringByDeletingPathExtension]]];

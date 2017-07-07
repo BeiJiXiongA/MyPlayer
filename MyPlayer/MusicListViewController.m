@@ -100,18 +100,19 @@
     NSError *error = nil;
     NSArray *documentFiles = [_fileManager contentsOfDirectoryAtPath:docDir error:&error];
     [documentFiles enumerateObjectsUsingBlock:^(NSString *musicName, NSUInteger idx, BOOL * _Nonnull stop) {
-        
-        dispatch_async(dispatch_get_global_queue(0, 0), ^{
-            NSString *musicPath = [CatalogueTools getDocumentPathWithName:musicName];
-            MusicModel *model = [[MusicModel alloc] init];
-            model.musicName = musicName;
-            model.musicInfo = [self getInfoWithMusicPath:musicPath];
-            [_listArray addObject:model];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [MyMusicPlayer sharedMusicPlayer].musicList = _listArray;
-                [_listTableView reloadData];
+        if (![musicName isEqualToString:@"images"]) {
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                NSString *musicPath = [CatalogueTools getDocumentPathWithName:musicName];
+                MusicModel *model = [[MusicModel alloc] init];
+                model.musicName = musicName;
+                model.musicInfo = [self getInfoWithMusicPath:musicPath];
+                [_listArray addObject:model];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [MyMusicPlayer sharedMusicPlayer].musicList = _listArray;
+                    [_listTableView reloadData];
+                });
             });
-        });
+        }
     }];
     
 }
@@ -282,6 +283,7 @@
             [_searchResultArray addObject:musicModel];
         }
     }];
+    [MyMusicPlayer sharedMusicPlayer].musicList = _searchResultArray;
     [_listTableView reloadData];
 }
 
@@ -289,6 +291,7 @@
 {
      NSLog(@"%s",__func__);
     _musicSearchBar.showsCancelButton = NO;
+    [MyMusicPlayer sharedMusicPlayer].musicList = _listArray;
     [_musicSearchBar resignFirstResponder];
     _musicSearchBar.text = @"";
     [_searchResultArray removeAllObjects];
